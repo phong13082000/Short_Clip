@@ -17,8 +17,7 @@ double B0=0; // thoi gian video da dc buffer video hien tai
 double B1=0; // thoi gian video da dc buffer video tiep theo
 double B2=0; // thoi gian video da dc buffer video thu 3
 double Buf[30]; // thoi gian buffer cua tung video
-double Segm[30]; // segment buffer tung video
-int a=1;
+int a;
 int Bseg =3; // gioi han so segment dc buffer
 int K=4; // so luong next video dc buffer
 double seg=0; // segment = 1 se buffer 1s cho video
@@ -57,6 +56,7 @@ int main()
     for (int i=0; i<30;i++)
     {
         s+=user_trace[i];
+        Buf[i]=0;
     }
     // cout << s<<endl;
     int x=3; // chon thuat toan
@@ -67,37 +67,48 @@ int main()
     {
         case 3: // Proposed
         {
-            while(t<=500)
+            while(t<=250)
             {
                 if(tx>=user_trace[video]) // chuyen video
                 {
                     Waste+= (Buf[video]-Q);
                     W= (Buf[video]-Q); 
-                    if (Buf[video] < 15)
+                    if ((Buf[video]-Q) < Bseg)
                     {
-                        W+= Segm[video];
-                        Waste+=Segm[video];
+                        W+= seg;
+                        Waste+=seg;
+                        seg=0;
                     }
                     cout <<"video: "<< video<< " " <<"W: "<< W << " "<<"t: "<< t << endl; 
                     Q=0;
                     tx=0;
-                    video++;     
+                    video++; 
                 }
                 // cout << t<<endl;
                 if(video == Tong_video) // user ko xem nua
                 {
                     // cout << t;
                     break;
+                }else if (video < Tong_video-1)  // chon video it buffer nhat de buffer
+                {
+                    a= 1;
+                    for(int i=video+2; (i <= video+K)&&(i < Tong_video); i++)
+                    {
+                        if (Buf[video+a] > Buf[i])
+                        {
+                            a= i-video;
+                        }
+                    }  
                 }
                 if((Buf[video]-Q)<=0) // rebuffer
                 {
                     while ((Buf[video]-Q)<=0)
                     {
-                        Segm[video]+=time_step*(BW[(int)t]/bitrate);
-                        if( Segm[video] >=1)
+                        seg+=time_step*(BW[(int)t]/bitrate);
+                        if( seg >=1)
                         {
-                            Buf[video]+=Segm[video];
-                            Segm[video]=0;
+                            Buf[video]+=seg;
+                            seg=0;
                         }
                         tx+=time_step;
                         Tb+=time_step;
@@ -114,47 +125,70 @@ int main()
                 {
                     if(Buf[video] < 15 && video < Tong_video && (Buf[video]-Q) < Bseg) //buffer video hien tai
                     {
-                        // BW=5000 => sau 0.01s nó tải đc 50kb => buffer cho video đc 50/1000 = 0.05s
-                        Segm[video]+=time_step*(BW[(int)t]/bitrate);
-                        if( Segm[video] >=1)
+                        while(1)
                         {
-                            Buf[video]+=Segm[video];
-                            Segm[video]=0;
+                            // BW=5000 => sau 0.01s nó tải đc 50kb => buffer cho video đc 50/1000 = 0.05s
+                            seg+=time_step*(BW[(int)t]/bitrate);
+                            tx+=time_step;
+                            t+=time_step;
+                            if((Buf[video]-Q)>0)
+                            {
+                                Q+=time_step;
+                            }else if ((Buf[video]-Q)<=0)
+                            {
+                                break;
+                            }
+                            if(tx>=user_trace[video])
+                            {
+                                break;
+                            }
+                            if( seg >=1)
+                            {
+                                Buf[video]+=seg;
+                                seg=0;
+                                break;
+                            }   
                         }
-                    }else if((Buf[video]-Q) >= Bseg && (Buf[video+a]-Q) < Bseg && video < Tong_video - 1 )
+                    }else if((Buf[video]-Q) >= Bseg && (Buf[video+a]-Q) < Bseg && video < Tong_video - 1 ) // buffer video tiep theo
                     {
-                        Segm[video+a]+=time_step*(BW[(int)t]/bitrate);
-                        if( Segm[video+a] >=1)
+                        while(1)
                         {
-                            Buf[video+a]+=Segm[video+a];
-                            Segm[video+a]=0;
-                            a++;       
-                        }
-                        if (a > K || video+a >= Tong_video)
-                        {
-                            a=1;
-                        }
-                        
+                            // BW=5000 => sau 0.01s nó tải đc 50kb => buffer cho video đc 50/1000 = 0.05s
+                            seg+=time_step*(BW[(int)t]/bitrate);
+                            tx+=time_step;
+                            t+=time_step;
+                            if((Buf[video]-Q)>0)
+                            {
+                                Q+=time_step;
+                            }else if ((Buf[video]-Q)<=0) // rebuffer trong luc buffer next K video
+                            {
+                                Tb+=time_step;
+                                TB+=time_step;
+                            }
+                            if(tx>=user_trace[video]) // chuyen video trong luc buffer next K video
+                            {
+                                Waste+= (Buf[video]-Q);
+                                W= (Buf[video]-Q); 
+                                cout <<"video: "<< video<< " " <<"W: "<< W << " "<<"t: "<< t << endl; 
+                                Q=0;
+                                tx=0;
+                                video++; 
+                            }
+                            if( seg >=1)
+                            {
+                                Buf[video+a]+=seg;
+                                seg=0;
+                                break;
+                            }   
+                        }                      
+                    }else if(((Buf[video]-Q) >= Bseg && (Buf[video+a]-Q) > Bseg && video < (Tong_video-1)) || ((Buf[video]-Q) >= Bseg && video < Tong_video)) // da buffer het B segment video hien tai va next K video
+                    {
+                        tx+=time_step;
+                        t+=time_step;
+                        Q+=time_step;
                     }
-                    // else if(Buf[video] >=15 && Buf[video+1] < 15 && video < Tong_video -1) // buffer next video 
-                    // {
-                    //     seg+=time_step*(BW[(int)t]/bitrate);
-                    //     if( seg >=1)
-                    //     {
-                    //         Buf[video+1]+=seg;
-                    //         seg=0;
-                    //     }
-                    //     Q+=time_step;
-                    //     tx+=time_step;
-                    // }else if ((Buf[video] >=15 && Buf[video+1] >= 15 && video < Tong_video-1) || (Buf[video] >=15 && video == Tong_video-1)  ) // da buffer toan bo video hien tai va next video
-                    // {
-                    //     Q+=time_step;
-                    //     tx+=time_step;
-                    // }
-                    Q+=time_step;
-                    tx+=time_step;
-                    t+=time_step;
                 }  
+                // cout << "t: "<< t << endl;
             }
             break;
         }
@@ -340,5 +374,5 @@ int main()
     }
     
     cout << "Waste: " << Waste << endl<< "Time rebuffer: "<< TB;
-
+    return 0;
 }
