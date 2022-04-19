@@ -14,6 +14,7 @@ double bitrate = 1000; // 1000 kb/s
 double time_step=0.001;
 int Tong_video =30;
 double s=0; // tong thoi gian user xem
+int p=0; // So TH
 void Read_BW(double BW[250])// doc file network trace
 {
     ifstream Network ("trace1.txt");
@@ -192,8 +193,8 @@ int main()
                 // cout << "t: "<< t << endl;
             }  
                 // cout << "t: "<< t << endl;
-            
-            // cout << "Waste: " << Waste << " " << "Time rebuffer: "<< TB << endl;
+            p++;
+            cout << "Waste: " << Waste  << " Time rebuffer: "<< TB << " TH thu: " << p << endl;
         }
     }
 }
