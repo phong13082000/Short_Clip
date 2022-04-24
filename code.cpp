@@ -19,11 +19,11 @@ double B2=0; // thoi gian video da dc buffer video thu 3
 double Buf[30]; // thoi gian buffer cua tung video
 int a;
 int v=0;
-int Bseg =1; // gioi han so segment dc buffer
-int K=1; // so luong next video dc buffer
+int Bseg =3; // gioi han so segment dc buffer
+int K=3; // so luong next video dc buffer
 double seg=0; // segment = 1 se buffer 1s cho video
 double bitrate = 1000; // 1000 kb/s
-double time_step=0.1;
+double time_step=0.001;
 int video =0;
 int Tong_video =30;
 double s=0; // tong thoi gian user xem
@@ -74,7 +74,7 @@ int main()
                 {
                     Waste+= (Buf[video]-Q);
                     W= (Buf[video]-Q); 
-                    if ((Buf[video]-Q) < Bseg || Buf[video] < 15)
+                    if ((Buf[video]-Q) < Bseg && Buf[video] < 15)
                     {
                         W+= seg;
                         Waste+=seg;
@@ -84,7 +84,7 @@ int main()
                     Q=0;
                     tx=0;
                     video++; 
-                    cout << "chuyen video t: "<<t<<endl;
+                    // cout << "chuyen video t: "<<t<<endl;
                 }
                 // cout << t<<endl;
                 if(video == Tong_video) // user ko xem nua
@@ -120,7 +120,7 @@ int main()
                         {
                             break;
                         }
-                        cout << "rebuffer t: "<< t << endl;
+                        // cout << "rebuffer t: "<< t << endl;
                     }
                     cout <<"video: "<<video << " " <<"Tb: "<< Tb <<" "<<"t: "<< t << endl;
                     Tb=0;
@@ -151,9 +151,9 @@ int main()
                                 seg=0;
                                 break;
                             }   
-                            cout << "buffer video hien tai t: "<< t << endl;
+                            // cout << "buffer video hien tai t: "<< t << endl;
                         }
-                    }else if(((Buf[video]-Q) >= Bseg || Buf[video] >=15 )&& ((Buf[video+a]-Q) < Bseg && Buf[video+a] <15)&& video < Tong_video - 1 ) // buffer video tiep theo
+                    }else if( Buf[video+a] < Bseg && video < Tong_video - 1 ) // buffer video tiep theo
                     {
                         while(1)
                         {
@@ -168,7 +168,7 @@ int main()
                             {
                                 Tb+=time_step;
                                 TB+=time_step;
-                                cout << " rebuffer trong luc buffer next video t: "<< t << endl;
+                                // cout << " rebuffer trong luc buffer next video t: "<< t << endl;
                             }
                             if(tx>=user_trace[video]) // chuyen video trong luc buffer next K video
                             {
@@ -183,7 +183,7 @@ int main()
                                 {
                                     break;
                                 }
-                                cout << " chuyen video trong luc buffer next K video t: "<< t << endl;
+                                // cout << " chuyen video trong luc buffer next K video t: "<< t << endl;
                             }
                             if( seg >=1)
                             {
@@ -192,17 +192,17 @@ int main()
                                 v=0;
                                 break;
                             }   
-                            cout << " buffer video tiep theo t: "<< t << endl;
+                            // cout << " buffer video tiep theo t: "<< t << endl;
                         }                      
-                    }else if(((((Buf[video]-Q) >= Bseg || Buf[video] >=15 ) && ((Buf[video+a]-Q) > Bseg || Buf[video+a] >=15 )&& video < (Tong_video-1))) || (((Buf[video]-Q) >= Bseg || Buf[video] >=15 ) && video == (Tong_video-1))) // da buffer het B segment video hien tai va next K video
+                    }else // da buffer het B segment video hien tai va next K video
                     {
                         tx+=time_step;
                         t+=time_step;
                         Q+=time_step;
-                        cout << "khong buffer t: "<<t<<endl;
+                        // cout << "khong buffer t: "<<t<<endl;
                     }
                 }  
-                cout << "t: "<< t << endl;
+                // cout << "t: "<< t << endl;
             }
             break;
         }

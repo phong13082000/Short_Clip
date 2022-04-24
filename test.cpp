@@ -62,7 +62,7 @@ int main()
                 {
                     Waste+= (Buf[video]-Q);
                     W= (Buf[video]-Q); 
-                    if ((Buf[video]-Q) < Bseg || Buf[video] < 15)
+                    if ((Buf[video]-Q) < Bseg && Buf[video] < 15)
                     {
                         W+= seg;
                         Waste+=seg;
@@ -141,7 +141,7 @@ int main()
                             }   
                             // cout << "buffer video hien tai t: "<< t << endl;
                         }
-                    }else if(((Buf[video]-Q) >= Bseg || Buf[video] >=15 )&& ((Buf[video+a]-Q) < Bseg && Buf[video+a] <15)&& video < Tong_video - 1 ) // buffer video tiep theo
+                    }else if(Buf[video+a] < Bseg && video < Tong_video - 1 ) // buffer video tiep theo
                     {
                         while(1)
                         {
@@ -182,7 +182,7 @@ int main()
                             }   
                             // cout << " buffer video tiep theo t: "<< t << endl;
                         }                      
-                    }else if(((((Buf[video]-Q) >= Bseg || Buf[video] >=15 ) && ((Buf[video+a]-Q) > Bseg || Buf[video+a] >=15 )&& video < (Tong_video-1))) || (((Buf[video]-Q) >= Bseg || Buf[video] >=15 ) && video == (Tong_video-1))) // da buffer het B segment video hien tai va next K video
+                    }else // da buffer het B segment video hien tai va next K video
                     {
                         tx+=time_step;
                         t+=time_step;
