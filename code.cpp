@@ -185,6 +185,11 @@ int main()
                                 }
                                 // cout << " chuyen video trong luc buffer next K video t: "<< t << endl;
                             }
+                            if (v>a)
+                            {
+                                seg=0;
+                                break;
+                            }
                             if( seg >=1)
                             {
                                 Buf[video+a-v]+=seg;
