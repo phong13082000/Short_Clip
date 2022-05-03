@@ -143,6 +143,7 @@ int main()
                         }
                     }else if(Buf[video+a] < Bseg && video < Tong_video - 1 ) // buffer video tiep theo
                     {
+                        v=0;
                         while(1)
                         {
                             // BW=5000 => sau 0.01s nó tải đc 50kb => buffer cho video đc 50/1000 = 0.05s
@@ -182,7 +183,7 @@ int main()
                             {
                                 Buf[video+a-v]+=seg;
                                 seg=0;
-                                v=0;
+                            
                                 break;
                             }   
                             // cout << " buffer video tiep theo t: "<< t << endl;
