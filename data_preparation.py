@@ -10,7 +10,7 @@ import numpy as np
 # In[8]:
 
 
-mu, sigma = 12, 6
+mu, sigma = 6, 3
 
 
 # In[9]:
