@@ -4,11 +4,12 @@
 
 using namespace std;
 // user trace
-double user_trace[30] ={15.57795671, 19.10070052, 20.87108367, 27.81344504, 20.48538818, 12.23868246,  9.60973767,  7.27891733, 36.44802634, 29.99245136, 26.62980921,  0.82352023, 16.19487166, 16.27068487, 30.95755438, 24.70715178, 20.26623842, 27.74044977, 18.17260481, 23.2370618 , 30.50835249,  7.55502456, 16.89573937,  5.15584425, 18.04638475, 12.15315521, 29.22638936, 28.8735984 , 24.58742808, 41.41185648};
+double user_trace[30] ={3.39000295,  4.19023632,  3.36040886,  6.4743884 ,  1.07649651, 3.18809352,  4.33270505,  5.05307169,  3.26893777, 14.86689934, 10.84986202,  1.52934174,  5.0338094 ,  5.10926823,  6.51793169, 7.99837617,  2.37411482,  4.93306196,  0.25718793,  3.91265111, 5.36237206, 10.75861334,  9.83579555,  6.23926547,  0.106591  , 8.49352796,  3.99947568,  6.78984908,  5.37966168, 10.62492493};
 double BW[250]; // network trace
 double t=0; // thoi gian thuc
 double Tb=0; // thoi gian rebuffer
 double TB=0; // tong thoi gian rebuffer
+double D=0;
 double W=0; // waste
 double Waste=0; // tong waste
 double Q=0; // thoi gian chay video hien tai
@@ -30,7 +31,7 @@ double s=0; // tong thoi gian user xem
 // doc file network trace
 void Read_BW(double BW[250])
 {
-    ifstream Network ("trace3.txt");
+    ifstream Network ("trace0.txt");
     if(! Network.is_open())
     {
         cout <<"Khong the mo file.\n";
@@ -142,6 +143,10 @@ int main()
                         Tb+=time_step;
                         TB+=time_step;
                         t+=time_step;
+                        if(Q==0)
+                        {
+                            D+=time_step;
+                        }
                         if(tx>=user_trace[video])
                         {
                             break;
@@ -195,6 +200,10 @@ int main()
                             {
                                 Tb+=time_step;
                                 TB+=time_step;
+                                if(Q==0)
+                                {
+                                    D+=time_step;
+                                }
                                 // cout << " rebuffer trong luc buffer next video t: "<< t << endl;
                             }
                             if(tx>=user_trace[video]) // chuyen video trong luc buffer next K video
@@ -280,6 +289,10 @@ int main()
                         Tb+=time_step;
                         TB+=time_step;
                         t+=time_step;
+                        if(Q==0)
+                        {
+                            D+=time_step;
+                        }
                         if(tx>=user_trace[video])
                         {
                             break;
@@ -363,6 +376,10 @@ int main()
                         Tb+=time_step;
                         TB+=time_step;
                         t+=time_step;
+                        if(Q==0)
+                        {
+                            D+=time_step;
+                        }
                         if(tx==user_trace[video]||tx>user_trace[video])
                         {
                             break;
@@ -420,6 +437,6 @@ int main()
             break;
     }
     
-    cout << "Waste: " << Waste << endl<< "Time rebuffer: "<< TB;
+    cout << "Waste: " << Waste << endl<< "Time rebuffer: "<< TB-D << endl << "Start-up delay: "<<D;
     return 0;
 }
